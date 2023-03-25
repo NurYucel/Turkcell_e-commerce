@@ -1,39 +1,41 @@
 package kodlama.io.ecommerce.business.concretes;
 
 import kodlama.io.ecommerce.business.abstracts.ProductService;
-import kodlama.io.ecommerce.entities.concretes.Product;
-import kodlama.io.ecommerce.repository.abstracts.ProductRepository;
+import kodlama.io.ecommerce.entities.Product;
+import kodlama.io.ecommerce.repository.ProductRepository;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-@Service//otomatik new'leme
+//@Service
+@Repository
+@AllArgsConstructor
 public class ProductManager implements ProductService {
     private final ProductRepository repository;
-    public ProductManager(ProductRepository repository){
-        this.repository = repository;
-    }
     @Override
     public List<Product> getAll() {
-        return repository.getAll();
+        return repository.findAll();
     }
     @Override
     public Product getById(int id){
-        return repository.getById(id);
+        checkIfBrandExists(id);
+        return repository.findById(id).orElseThrow();
     }
     @Override
     public Product add(Product product) {
         validateProduct(product);
-        return repository.add(product);
+        return repository.save(product);
     }
 
     @Override
     public Product update(int id, Product product) {
         validateProduct(product);
-        return update(id,product);
+        return repository.save(product);
     }
     @Override
     public void delete(int id) {
-        repository.delete(id);
+        repository.deleteById(id);
     }
     private void validateProduct(Product product){
         checkIfPriceValid(product);
@@ -51,4 +53,11 @@ public class ProductManager implements ProductService {
                 product.getDescription().length() > 50 )
             throw new IllegalArgumentException("Description cannot be less than 10 and bigger than 50 characters");
     }
+
+    private void checkIfBrandExists(int id){
+        if(!repository.existsById(id)){
+            throw  new RuntimeException("Marka bulunamadı");
+        }
+    }
+
 }
