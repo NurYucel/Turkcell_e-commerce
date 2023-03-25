@@ -56,7 +56,7 @@ public class ProductManager implements ProductService {
 
     private void checkIfBrandExists(int id){
         if(!repository.existsById(id)){
-            throw  new RuntimeException("Marka bulunamadı");
+            throw  new RuntimeException("Can not find any product");
         }
     }
 
